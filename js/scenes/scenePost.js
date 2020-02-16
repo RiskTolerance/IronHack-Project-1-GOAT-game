@@ -7,6 +7,10 @@ let goatSurvived;
 let cultist;
 let goat;
 let outcome;
+let sorry;
+let duoWinMusic;
+let soloWinMusic;
+let lossMusic;
 
 class ScenePost extends Phaser.Scene {
     constructor() {
@@ -17,7 +21,7 @@ class ScenePost extends Phaser.Scene {
                     {
                         type: 'image',
                         key: 'loadingOverlay',
-                        url: '/images/UI/Loading Screen/LoadingScreen.png'
+                        url: 'images/UI/Loading Screen/LoadingScreen.png'
                     }
                 ]
             }
@@ -58,23 +62,28 @@ class ScenePost extends Phaser.Scene {
         this.load.image('goatSurvived', 'images/UI/Post Screen/GoatSurvived.png')
         this.load.image('mainMenu', 'images/UI/Post Screen/MainMenu.png')
         this.load.image('playAgain', 'images/UI/Post Screen/PlayAgain.png')
+        this.load.image('sorry', 'images/UI/Post Screen/tempText.png')
         this.load.spritesheet('cultistRun', 'images/Characters/cultist/cultist run_animation 12frames 40px.png', {frameWidth: 40, frameHeight: 40});
         this.load.spritesheet('goatRun', 'images/Characters/goat/goat walk 6frames 40px.png', {frameWidth: 40, frameHeight: 40});
 
         //music
-        this.load.audio('duoWinMusic', 'audio/Background Music/ES_Blind Faith - Phoenix Tail.mp3');
-        this.load.audio('soloWinMusic', 'audio/Background Music/ES_Barrel - Christian Andersen.mp3');
-        this.load.audio('lossMusic', 'audio/Background Music/ES_The Adventure Begins - Philip Ayers.mp3');
+        this.load.audio('duoWinMusic', 'audio/Background Music/ES_The Adventure Begins - Philip Ayers.mp3');
+        this.load.audio('soloWinMusic', 'audio/Background Music/ES_Blind Faith - Phoenix Tail.mp3');
+        this.load.audio('lossMusic', 'audio/Background Music/ES_Barrel - Christian Andersen.mp3');
     }
     create() {
         //define objects
         endScreen = this.add.image(640, 360, 'endScreen');
-        playAgain = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'playAgain').setInteractive().setTint(0xff0000);
-        mainMenu = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 75, 'mainMenu').setInteractive().setTint(0xff0000);
+        // playAgain = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'playAgain').setInteractive().setTint(0xff0000);
+        // mainMenu = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 75, 'mainMenu').setInteractive().setTint(0xff0000);
+        sorry = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY + 75, 'sorry').setInteractive().setTint(0xffffff);
         noSurvivors = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY - 150, 'noSurvivors').setVisible(false);
         goatSurvived = this.add.image(this.cameras.main.centerX + 300, this.cameras.main.centerY - 150, 'goatSurvived').setVisible(false);
         cultistSurvived = this.add.image(this.cameras.main.centerX - 300, this.cameras.main.centerY - 150, 'cultistSurvived').setVisible(false);
-
+        soloWinMusic = this.sound.add('duoWinMusic');
+        duoWinMusic = this.sound.add('soloWinMusic');
+        lossMusic = this.sound.add('lossMusic');
+        
         this.anims.create({
             key: 'rightRun',
             frames: this.anims.generateFrameNumbers('cultistRun', { start: 6, end: 11}),
@@ -90,57 +99,65 @@ class ScenePost extends Phaser.Scene {
 
         goat = this.add.sprite(this.cameras.main.centerX + 300, this.cameras.main.centerY + 180, 'goatRun', 3).setVisible(false);
         cultist = this.add.sprite(this.cameras.main.centerX - 300, this.cameras.main.centerY + 180, 'cultistRun', 6).setVisible(false);
-    
+
         //play button actions
-        playAgain.on('pointerout', ()=>{
-            playAgain.setTint(0xff0000);
-        })
 
-        playAgain.on('pointerover', ()=>{
-            playAgain.setTint(0xffffff);
-        })
+    //     playAgain.on('pointerout', ()=>{
+    //         playAgain.setTint(0xff0000);
+    //     })
 
-        playAgain.on('pointerup', ()=>{
-            //this.menuMusic.pause(musicConfig);
-            this.scene.start('SceneGame'),
-            this.scene.stop('ScenePost')
-        }, this);
+    //     playAgain.on('pointerover', ()=>{
+    //         playAgain.setTint(0xffffff);
+    //     })
+
+    //     playAgain.on('pointerup', ()=>{
+    //         //this.menuMusic.pause(musicConfig);
+    //         this.scene.start('SceneGame'),
+    //         this.scene.stop('ScenePost')
+    //     }, this);
         
-        //story button actions
+    //     //story button actions
 
-        //main menu button actions
-        mainMenu.on('pointerout', ()=>{
-            mainMenu.setTint(0xff0000);
-        })
+    //     //main menu button actions
+    //     mainMenu.on('pointerout', ()=>{
+    //         mainMenu.setTint(0xff0000);
+    //     })
 
-        mainMenu.on('pointerover', ()=>{
-            mainMenu.setTint(0xffffff);
-        })
+    //     mainMenu.on('pointerover', ()=>{
+    //         mainMenu.setTint(0xffffff);
+    //     })
 
-        mainMenu.on('pointerup', ()=>{
-            //this.menuMusic.pause(musicConfig);
-            this.scene.start('SceneMenu'),
-            this.scene.stop('ScenePost')
-        }, this);
+    //     mainMenu.on('pointerup', ()=>{
+    //         //this.menuMusic.pause(musicConfig);
+    //         this.scene.start('SceneMenu'),
+    //         this.scene.stop('ScenePost')
+    //     }, this);
+    
+    if (outcome === 3) {
+        //both win
+        goatSurvived.setVisible(true);
+        cultistSurvived.setVisible(true);
+        goat.anims.play('goatRightRun', true);
+        cultist.anims.play('rightRun', true);
+        duoWinMusic.play();
+    } else if (outcome === 2) {
+        //goat wins
+        goatSurvived.setVisible(true);
+        goat.anims.play('goatRightRun', true);
+        soloWinMusic.play();
+    } else if (outcome === 1) {
+        //cultist wins
+        cultistSurvived.setVisible(true);
+        cultist.anims.play('rightRun', true);
+        soloWinMusic.play();
+    } else {
+        noSurvivors.setVisible(true);
+        lossMusic.play();
     }
+
+    }
+
     update() {
         //game loop
-        if (outcome === 3) {
-            //both win
-            goatSurvived.setVisible(true);
-            cultistSurvived.setVisible(true);
-            goat.anims.play('goatRightRun', true);
-            cultist.anims.play('rightRun', true);
-        } else if (outcome === 2) {
-            //goat wins
-            goatSurvived.setVisible(true);
-            goat.anims.play('goatRightRun', true);
-        } else if (outcome === 1) {
-            //cultist wins
-            cultistSurvived.setVisible(true);
-            cultist.anims.play('rightRun', true);
-        } else {
-            noSurvivors.setVisible(true);
-        }
     }
 }

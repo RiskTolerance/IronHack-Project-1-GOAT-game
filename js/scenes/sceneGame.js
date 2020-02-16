@@ -36,7 +36,7 @@ class SceneGame extends Phaser.Scene {
                     {
                         type: 'image',
                         key: 'loadingOverlay',
-                        url: '/images/UI/Loading Screen/LoadingScreen.png'
+                        url: 'images/UI/Loading Screen/LoadingScreen.png'
                     }
                 ]
             }
@@ -98,7 +98,6 @@ class SceneGame extends Phaser.Scene {
         this.load.audio('player2JumpSound', 'audio/Sound Effects/GoatJump.mp3');
         this.load.audio('playerDeathSound', 'audio/Sound Effects/CultistDeath.mp3');
         this.load.audio('player2DeathSound', 'audio/Sound Effects/GoatDeath.mp3');
-        this.load.audio('death', '/audio/Sound Effects/Death.mp3');
     }
     
     create() {
@@ -552,15 +551,15 @@ class SceneGame extends Phaser.Scene {
 
         if (py < 350 || p2y < 350){
             if (playerWin === 1 && player2Win === 1) {
-                // this.gameMusic.stop(this.musicConfig);
+                this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:3 }), this;
                 this.scene.stop('SceneGame'), this;
             } else if (playerState === 0){
-                // this.gameMusic.stop(this.musicConfig);
+                this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:2 }), this;
                 this.scene.stop('SceneGame'), this;
             } else if (player2State === 0){
-                // this.gameMusic.stop(this.musicConfig);
+                this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:1 }), this;
                 this.scene.stop('SceneGame'), this;
             } else {
@@ -569,15 +568,15 @@ class SceneGame extends Phaser.Scene {
         };
 
         if (playerState === 0 && player2State === 0) {
-                // this.gameMusic.stop(this.musicConfig);
+                this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:0 }), this;
                 this.scene.stop('SceneGame'), this;
             } else if (playerWin === 1){
-                // this.gameMusic.stop(this.musicConfig);
+                this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:1 }), this;
                 this.scene.stop('SceneGame'), this;
             } else if (player2Win === 1){
-                // this.gameMusic.stop(this.musicConfig);
+                this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:2 }), this;
                 this.scene.stop('SceneGame'), this;
             } else {

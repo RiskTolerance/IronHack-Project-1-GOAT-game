@@ -9,7 +9,7 @@ let controlsScreen;
 let backButtonWhite;
 let loadingBar;
 let overlay;
-//let backButtonOrange;
+let buttonSound;
 
 class SceneMenu extends Phaser.Scene {
     constructor() {
@@ -20,7 +20,7 @@ class SceneMenu extends Phaser.Scene {
                     {
                         type: 'image',
                         key: 'loadingOverlay',
-                        url: '/images/UI/Loading Screen/LoadingScreen.png'
+                        url: 'images/UI/Loading Screen/LoadingScreen.png'
                     }
                 ]
             }
@@ -60,7 +60,9 @@ class SceneMenu extends Phaser.Scene {
         this.load.image('storyWhite','images/UI/Main Menu/storyWhite.png');
         this.load.image('controlsScreen','images/UI/Controls/ControlsV2.png');
         this.load.image('storyScreen','images/UI/Story/StoryV2.png');
-        this.load.image('backButtonWhite','/images/UI/Controls/BackWhite.png');
+        this.load.image('backButtonWhite','images/UI/Controls/BackWhite.png');
+        //button sound
+        this.load.audio('button', 'audio/Sound Effects/ES_Bass Drum 2 - SFX Producer.mp3');
         //music
         this.load.audio('menuMusic', 'audio/Background Music/ES_The Dominion - Bonnie Grace.mp3');
     }
@@ -75,7 +77,7 @@ class SceneMenu extends Phaser.Scene {
         storyScreen = this.add.image(640, 360, 'storyScreen').setVisible(false);
         controlsScreen = this.add.image(640, 360, 'controlsScreen').setVisible(false);
         backButtonWhite = this.add.image(100, 100, 'backButtonWhite').setInteractive().setActive(false).setTint(0xFF0000).setVisible(false);
-        //backButtonOrange = this.add.image(100, 100, 'backButtonOrange').setInteractive().setActive(false).setVisible(false);
+        buttonSound = this.sound.add('button');
 
         //play button actions
         playButton.on('pointerout', ()=>{
@@ -87,6 +89,7 @@ class SceneMenu extends Phaser.Scene {
         })
 
         playButton.on('pointerup', ()=>{
+            buttonSound.play();
             this.menuMusic.stop(musicConfig);
             this.scene.start('SceneGame');
             this.scene.stop('SceneMenu');
@@ -103,6 +106,7 @@ class SceneMenu extends Phaser.Scene {
         });
 
         storyButton.on('pointerup', ()=>{
+            buttonSound.play();
             storyScreen.setVisible(true);
             backButtonWhite.setActive(true).setVisible(true);
         });
@@ -118,21 +122,10 @@ class SceneMenu extends Phaser.Scene {
         });
 
         controlsButton.on('pointerup', ()=>{
+            buttonSound.play();
             controlsScreen.setVisible(true);
             backButtonWhite.setActive(true).setVisible(true);
-            //backButtonOrange.setActive(true).setVisible(true);
         });
-
-        this.menuMusic = this.sound.add('menuMusic') 
-        this.musicConfig = {
-            mute: false,
-            volume: 0.4,
-            rate: 1,
-            detune: 0,
-            seek: 0,
-            loop: true,
-            delay: 0
-        }
 
         //back button actions
 
@@ -145,11 +138,10 @@ class SceneMenu extends Phaser.Scene {
         })
 
         backButtonWhite.on('pointerup', ()=>{
+            buttonSound.play();
             controlsScreen.setVisible(false);
             storyScreen.setVisible(false);
             backButtonWhite.setActive(false).setVisible(false);
-            //backButtonOrange.setActive(false).setVisible(false);
-            
         })
 
         this.menuMusic = this.sound.add('menuMusic') 
