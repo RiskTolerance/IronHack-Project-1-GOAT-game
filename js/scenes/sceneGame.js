@@ -15,7 +15,7 @@ let playerState = 1; //alive = 1, dead = 0
 let player2State = 1;
 let playerWin = 0; //win =1
 let player2Win = 0;
-let i = 0.04;
+let i = 0.035;
 let demonSpeed = -1;
 let p1BlinkCooldown = 1;
 let p2BlinkCooldown = 1;
@@ -553,15 +553,12 @@ class SceneGame extends Phaser.Scene {
             if (playerWin === 1 && player2Win === 1) {
                 this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:3 }), this;
-                this.scene.stop('SceneGame'), this;
             } else if (playerState === 0){
                 this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:2 }), this;
-                this.scene.stop('SceneGame'), this;
             } else if (player2State === 0){
                 this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:1 }), this;
-                this.scene.stop('SceneGame'), this;
             } else {
                 console.log('the game continues!');
             };
@@ -570,15 +567,12 @@ class SceneGame extends Phaser.Scene {
         if (playerState === 0 && player2State === 0) {
                 this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:0 }), this;
-                this.scene.stop('SceneGame'), this;
             } else if (playerWin === 1){
                 this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:1 }), this;
-                this.scene.stop('SceneGame'), this;
             } else if (player2Win === 1){
                 this.gameMusic.stop(this.musicConfig);
                 this.scene.start('ScenePost', { id:2 }), this;
-                this.scene.stop('SceneGame'), this;
             } else {
                 console.log('the game continues!');
         };

@@ -29,7 +29,7 @@ class ScenePost extends Phaser.Scene {
     }
 
     init(data){
-        this.outcome = data.id;
+        outcome = data.id;
     }
 
     preload() {
@@ -80,8 +80,8 @@ class ScenePost extends Phaser.Scene {
         noSurvivors = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY - 150, 'noSurvivors').setVisible(false);
         goatSurvived = this.add.image(this.cameras.main.centerX + 300, this.cameras.main.centerY - 150, 'goatSurvived').setVisible(false);
         cultistSurvived = this.add.image(this.cameras.main.centerX - 300, this.cameras.main.centerY - 150, 'cultistSurvived').setVisible(false);
-        soloWinMusic = this.sound.add('duoWinMusic');
-        duoWinMusic = this.sound.add('soloWinMusic');
+        soloWinMusic = this.sound.add('soloWinMusic');
+        duoWinMusic = this.sound.add('duoWinMusic');
         lossMusic = this.sound.add('lossMusic');
         
         this.anims.create({
