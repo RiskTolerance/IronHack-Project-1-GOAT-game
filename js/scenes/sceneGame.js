@@ -20,18 +20,57 @@ let demonSpeed = -1;
 let p1BlinkCooldown = 1;
 let p2BlinkCooldown = 1;
 let keyboard;
+let cultistBlinkNotReady;
+let cultistBlinkReady;
+let goatBlinkNotReady;
+let goatBlinkReady;
+let cultistDead;
+let goatDead;
 
 class SceneGame extends Phaser.Scene {
     constructor() {
-        super('SceneGame');
+        super({
+            key: 'SceneGame',
+            pack: {
+                files: [
+                    {
+                        type: 'image',
+                        key: 'loadingOverlay',
+                        url: '/images/UI/Loading Screen/LoadingScreen.png'
+                    }
+                ]
+            }
+        });
     }
+
     preload() {
+        //loading bar
+
+        loadingBar = this.add.graphics();
+        overlay = this.add.image(640, 360, 'loadingOverlay');
+
+        this.load.on('progress', function (value) {
+            console.log(value);
+            loadingBar.clear();
+            loadingBar.fillStyle(0xff0000);
+            loadingBar.fillRect(200,100,900 * value,420);
+        });
+                    
+        this.load.on('fileprogress', function (file) {
+            console.log(file.src);
+        });
+            
+        this.load.on('complete', function () {
+            console.log('complete');
+            loadingBar.destroy();
+            overlay.destroy();
+        });
+
         //tilemaps and tilesets
         this.load.tilemapTiledJSON('map','images/Environment/mapv3.json');
         this.load.image('structuresPNG', 'images/Environment/Structures.png', {frameWidth: 32, frameHeight: 32});
         this.load.image('terrainPNG', 'images/Environment/Terrain.png', {frameWidth: 32, frameHeight: 32});
         //images
-        //this.load.image('background','images/Backgrounds/cavebg.png');
         this.load.image('overworldbg','images/Backgrounds/overworld-wgrad.png');
         //blink status indiccators
         this.load.image('CultistBlinkNotReady','images/Characters/status/CultistBlinkNotReady-8.png');
@@ -96,6 +135,15 @@ class SceneGame extends Phaser.Scene {
         demon.body.setOffset(0,100);
         demon.body.setAllowGravity(false);
 
+        //add player status indicators
+
+        cultistBlinkNotReady = this.add.image(1205, 75, 'CultistBlinkNotReady').setScrollFactor(0).setVisible(false);
+        cultistBlinkReady = this.add.image(1205, 75, 'CultistBlinkReady').setScrollFactor(0);
+        goatBlinkNotReady = this.add.image(75, 75, 'GoatBlinkNotReady').setScrollFactor(0).setVisible(false);
+        goatBlinkReady = this.add.image(75, 75, 'GoatBlinkReady').setScrollFactor(0);
+        cultistDead = this.add.image(1205, 75, 'CultistDead').setScrollFactor(0).setVisible(false);
+        goatDead = this.add.image(75, 75, 'GoatDead').setScrollFactor(0).setVisible(false);
+
         //Tiled colliders
         terrainLayer.setCollisionByProperty({ collides: true });
         structuresLayer.setCollisionByProperty({ collides: true });
@@ -107,7 +155,9 @@ class SceneGame extends Phaser.Scene {
             this.playerDeathSound.play();
             player.disableBody(true, true);
             playerState = 0;
-            outcome();
+            cultistBlinkNotReady.setVisible(false);
+            cultistBlinkReady.setVisible(false);
+            cultistDead.setVisible(true);
         };
 
         //wall kills player2
@@ -115,23 +165,9 @@ class SceneGame extends Phaser.Scene {
             this.player2DeathSound.play();
             player2.disableBody(true, true);
             player2State = 0;
-            outcome();
-        };
-
-        //players win/lose
-        function outcome () {
-            if (playerState === 0 && player2State === 0) {
-                //alert('PLAYERS BOTH LOSE!')
-                this.physics.pause();
-            } else if (playerWin === 1){
-                //alert('CULTIST IS THE ONLY SURVIVOR!');
-                this.physics.pause();
-            } else if (player2Win === 1){
-                //alert('GOAT IS THE ONLY SURVIVOR!');
-                this.physics.pause();
-            } else {
-                console.log('the game continues!');
-            };
+            goatBlinkNotReady.setVisible(false);
+            goatBlinkReady.setVisible(false);
+            goatDead.setVisible(true);
         };
         
         //add collisions 
@@ -263,6 +299,10 @@ class SceneGame extends Phaser.Scene {
     update() {
         //game loop
 
+        this.events.on('wake', function(){
+            console.log('start over');
+        })
+
         let px = player.body.position.x;
         let py = player.body.position.y;
         let p2x = player2.body.position.x;
@@ -334,10 +374,6 @@ class SceneGame extends Phaser.Scene {
             player2.body.setVelocityY(-500);
         }
 
-        //blink coodlown functions
-        
-        function p1Cooldown() {p1BlinkCooldown = 1, 3000};
-        function p2Cooldown() {p2BlinkCooldown = 1, 3000};
 
         //track player position for use in blink operations
         //RSA in 'blink RSA' stands for 'Right Short A' where 'A' is the starting position. blinkRSA would corrospond to RSB.
@@ -359,11 +395,17 @@ class SceneGame extends Phaser.Scene {
         // const blink2LSA = this.add.sprite(px + 20, py, 'blinkA', 0);
         // const blink2LSB = this.add.sprite(px + 20 - 50, py, 'blinkB', 0);
 
-        //function p1Cooldown() {p1BlinkCooldown = 1}, 3000;
-        function p1Cooldown() {setTimeout(function(){p1BlinkCooldown = 1}, 3000)};
-        function p2Cooldown() {setTimeout(function(){p2BlinkCooldown = 1}, 3000)};
-        //let p1Cooldown = (setTimeout(() => p1BlinkCooldown = 1), 3000);
-        //let p2Cooldown = (setTimeout(() => p2BlinkCooldown = 1), 3000);
+        //blink coodlown functions
+        function p1Cooldown() {setTimeout(function(){
+            p1BlinkCooldown = 1;
+            cultistBlinkNotReady.setVisible(false);
+            cultistBlinkReady.setVisible(true);
+            }, 3000)};
+        function p2Cooldown() {setTimeout(function(){
+            p2BlinkCooldown = 1;
+            goatBlinkNotReady.setVisible(false);
+            goatBlinkReady.setVisible(true);
+            }, 3000)};
 
         // Player blink Up
         if (Phaser.Input.Keyboard.JustDown(Emm) && (p1BlinkCooldown === 1)) 
@@ -374,6 +416,8 @@ class SceneGame extends Phaser.Scene {
                 blink2UB.anims.play('blinkExit');
                 player.setPosition(px + 20, py - 100);
                 p1BlinkCooldown = 0;
+                cultistBlinkReady.setVisible(false);
+                cultistBlinkNotReady.setVisible(true);
                 p1Cooldown();
             } else if(!terrainLayer.getTileAtWorldXY(px + 20, py - 50)){
                 this.blinkSound.play();
@@ -381,6 +425,8 @@ class SceneGame extends Phaser.Scene {
                 blink2USB.anims.play('blinkExit');
                 player.setPosition(px + 20, py - 50);
                 p1BlinkCooldown = 0;
+                cultistBlinkReady.setVisible(false);
+                cultistBlinkNotReady.setVisible(true);
                 p1Cooldown();
             }
         }
@@ -442,6 +488,8 @@ class SceneGame extends Phaser.Scene {
                 blinkUB.anims.play('blinkExit');
                 player2.setPosition(p2x + 20, p2y - 100);
                 p2BlinkCooldown = 0;
+                goatBlinkReady.setVisible(false);
+                goatBlinkNotReady.setVisible(true);
                 p2Cooldown();
             } else if(!terrainLayer.getTileAtWorldXY(p2x + 20, p2y - 50)){
                 this.blinkSound.play();
@@ -449,6 +497,8 @@ class SceneGame extends Phaser.Scene {
                 blinkUSB.anims.play('blinkExit');
                 player2.setPosition(p2x + 20, p2y - 50);
                 p2BlinkCooldown = 0;
+                goatBlinkReady.setVisible(false);
+                goatBlinkNotReady.setVisible(true);
                 p2Cooldown();
             }
         }
@@ -502,17 +552,36 @@ class SceneGame extends Phaser.Scene {
 
         if (py < 350 || p2y < 350){
             if (playerWin === 1 && player2Win === 1) {
-                //alert('PLAYERS BOTH WIN!')
-                this.physics.pause();
+                // this.gameMusic.stop(this.musicConfig);
+                this.scene.start('ScenePost', { id:3 }), this;
+                this.scene.stop('SceneGame'), this;
             } else if (playerState === 0){
-                //alert('GOAT IS THE ONLY SURVIVOR!');
-                this.physics.pause();
+                // this.gameMusic.stop(this.musicConfig);
+                this.scene.start('ScenePost', { id:2 }), this;
+                this.scene.stop('SceneGame'), this;
             } else if (player2State === 0){
-                //alert('CULTIST IS THE ONLY SURVIVOR!');
-                this.physics.pause();
+                // this.gameMusic.stop(this.musicConfig);
+                this.scene.start('ScenePost', { id:1 }), this;
+                this.scene.stop('SceneGame'), this;
             } else {
                 console.log('the game continues!');
             };
+        };
+
+        if (playerState === 0 && player2State === 0) {
+                // this.gameMusic.stop(this.musicConfig);
+                this.scene.start('ScenePost', { id:0 }), this;
+                this.scene.stop('SceneGame'), this;
+            } else if (playerWin === 1){
+                // this.gameMusic.stop(this.musicConfig);
+                this.scene.start('ScenePost', { id:1 }), this;
+                this.scene.stop('SceneGame'), this;
+            } else if (player2Win === 1){
+                // this.gameMusic.stop(this.musicConfig);
+                this.scene.start('ScenePost', { id:2 }), this;
+                this.scene.stop('SceneGame'), this;
+            } else {
+                console.log('the game continues!');
         };
     }
 }

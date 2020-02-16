@@ -7,7 +7,7 @@ window.onload = function(){
         pixelArt: true,
         fps: 30,
         parent: 'phaser-game',
-        scene: [ SceneMenu, SceneGame ],
+        scene: [ SceneMenu, SceneGame, ScenePost ],
         physics: {
             default: 'arcade',
             arcade: {
